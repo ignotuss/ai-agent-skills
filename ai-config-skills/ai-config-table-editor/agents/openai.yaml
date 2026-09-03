@@ -1,0 +1,3 @@
+interface:
+  display_name: "AI Config Table Editor"
+  short_description: "AI 编辑配置表格并同步到 Apollo：改表、生成 JSON、OpenAPI 更新并停在发布前"
