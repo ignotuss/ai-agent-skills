@@ -11,10 +11,25 @@ description: 将表格维护的配置同步到 Apollo 配置中心：按需求�
 
 ## 目录
 
+- 第 0 步（需求分析与方案确认）：见下文“第 0 步”章节
 - 第 1 步（改表）：[references/step1-table-guide.md](references/step1-table-guide.md)
 - 第 2 步（生成 JSON）：[references/step2-export.md](references/step2-export.md)
 - 第 3 步（更新 Apollo）：[references/step3-apollo-openapi.md](references/step3-apollo-openapi.md)
 - 表结构与依赖知识页：[references/table-knowledge/index.md](references/table-knowledge/index.md)
+
+## 第 0 步：需求分析与方案确认（改表前必经）
+
+收到自然语言需求后，先分析与检索，不直接动手：
+
+- 检索知识页与当前表数据，确定涉及哪张/哪几张表及具体改动方式；
+- 识别跨表联动、奖励/道具映射、导出与 Apollo 同步范围、源文件占用状态；
+- 输出“方案卡”并等待用户确认，确认后再进入第 1 步改表。
+
+方案卡至少包含：目标表、改动明细（表/行/列/旧值→新值）、影响面（关联表、是否同步 Apollo）、歧义点（附推荐默认）、后续动作（改表→校验→导出→同步）。
+
+必须等待确认的场景：跨多张表、映射存在歧义、知识库未覆盖的新依赖、删除或覆盖已有数据、涉及特殊处理字段、任何需要额外权限的改动。
+
+可直接执行（免确认）的场景：需求精确无歧义（如“某表某字段改为 N”），或用户明确说“直接改/不要问”。
 
 ## 第 1 步：按需求修改表格
 
@@ -23,6 +38,7 @@ description: 将表格维护的配置同步到 Apollo 配置中心：按需求�
 要点：
 
 - 改表前先查依赖：确认目标表被谁引用、引用谁（见 `table-knowledge` 知识页）。
+- 知识库按项目物理隔离（入口 `references/table-knowledge/index.md`）：Card 在 `table-knowledge/card/`，SuperChameleon 在 `table-knowledge/super-chameleon/`；**同名表不代表同规则，严禁跨项目套用**。
 - 源表被 Excel 打开时不能安全地外部写入：先保存并关闭，或经 Excel 自身会话修改。
 - 修改后必须跑一致性校验，全部通过再进入第 2 步导出。
 - 遇到知识库未覆盖的表或新依赖：先分析和用户确认，确认后再补录规则；不臆测。

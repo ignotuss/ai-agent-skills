@@ -19,13 +19,14 @@ ai-config-table-editor/
 │   ├── step1-table-guide.md        # 第 1 步：改表
 │   ├── step2-export.md             # 第 2 步：生成 JSON
 │   ├── step3-apollo-openapi.md     # 第 3 步：OpenAPI 更新 Apollo
-│   └── table-knowledge/            # 项目沉淀的表结构与依赖规则（按项目维护）
+│   └── table-knowledge/            # 多项目知识库：card/、super-chameleon/ 等，按项目隔离
 └── scripts/
     └── update_namespace.ps1        # OpenAPI 更新脚本模板（不含发布）
 ```
 
 ## 工作流
 
+0. 需求分析与方案确认：先检索知识页与当前数据，输出“改哪张表、怎么改”的方案卡，用户确认后再执行。
 1. 改表：先查 `references/table-knowledge/` 中的依赖规则；文件被 Excel 打开时不能安全写入；改完做一致性校验。
 2. 导出：sheet 名形如 `中文|English` 时产物为 `Conf{English}.json`；把改过的 xlsx 放入导出暂存区并运行导出工具。
 3. 更新 Apollo：目标命名空间 = JSON 文件名去掉 `.json`；找不到同名命名空间时停下反馈，不自动创建、不改名。
