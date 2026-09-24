@@ -73,6 +73,34 @@
 - 保存条目不等于生效：客户端读取的是已发布版本。自动更新后必须停在发布前，由用户到门户检查并手动发布。
 - 术语约定：用户说“发布到 Apollo / 同步到 Apollo”通常只是指“提交/更新条目”，不是调用 release。请求中出现“发布”字眼时仍默认按提交处理；只有用户明确要求“真正发布/调用发布接口/让配置生效”才调用发布接口。
 
+## 发布状态核验（实测可用）
+
+可用接口：
+
+`GET /openapi/v1/envs/{env}/apps/{appId}/clusters/{cluster}/namespaces/{namespace}/releases/latest`
+
+返回最新一次发布的 `id`（releaseId）、`name`、`comment`、发布人与 `configurations`（该次发布的内容快照）。
+
+不可用的接口（不要浪费时间）：
+
+- `GET .../namespaces/{namespace}/releases`（发布列表）通常返回 400 `Request method 'GET' not supported`；
+- `.../items/{key}/commits`、`.../commits` 等提交历史接口返回 404；
+- 门户页面接口需要登录态 cookie，OpenAPI Token 用不了。
+
+**所以 OpenAPI 看不到历史，只能看到"最新一次发布"和条目的最后修改时间/修改人。** 需要历史只能靠门户的发布历史页或外部记录（操作日志）。
+
+判断某个命名空间是否有“未发布的草稿改动”：
+
+1. `GET .../namespaces/{namespace}/items`，取 `key=content` 的 `value`（草稿）；
+2. `GET .../namespaces/{namespace}/releases/latest`，取 `configurations.content`（已发布快照）；
+3. 逐字比较：完全相同 → 草稿已生效；不同 → 存在未发布改动；`releases/latest` 报错 → 该命名空间从未发布过。
+
+注意点：
+
+- 用 `releases/latest.id` 作为“发布 ID”写进日志，便于事后追溯；`release.name` 是发布时填写的备注名。
+- `dataChangeCreatedTime` 是发布发生的时间；条目的 `dataChangeLastModifiedTime` / `dataChangeLastModifiedBy` 才是草稿最后一次修改的时间与人。两者要分开看。
+- 操作者字段常是 OpenAPI 用的账号（如 `apollo`），**用它区分不出“是谁”**：门户界面操作会记录各自的用户名，接口/脚本操作则统一是 token 所属账号。
+
 ## 校验
 
 - 修改前先 GET 记录原值，便于回滚。

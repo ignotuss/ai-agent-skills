@@ -23,11 +23,14 @@
 ## 执行流程
 
 1. 在 `$CONFIG_XLSX_DIR` 修改对应 xlsx，保存并关闭 Excel（文件被占用时复制会失败）。
-2. 复制到暂存区：
+2. **把源表同步到暂存区**。只同步流水线清单内的表，不要图省事把整个表目录拷进去——那会连带生成一批无关产物，也会把暂存区里本该清掉的旧副本混进来：
 
    ```powershell
-   Copy-Item <源表> $EXPORT_STAGING_DIR -Force
+   # 只拷流水线内的表（示例）
+   foreach ($n in $PipelineTables) { Copy-Item (Join-Path $CONFIG_XLSX_DIR $n) $EXPORT_STAGING_DIR -Force }
    ```
+
+   > 为什么必须刷新：暂存区里如果是旧副本，导出的 JSON 就不是最新表的内容，后面对比 Apollo 会得到假差异，甚至基于旧值同步。真实踩过：某项目有四张表的暂存副本分别停留在 15 天前。
 
 3. 运行导出器（直接调用工具，不要使用带 `pause` 的批处理，会卡住自动化）：
 

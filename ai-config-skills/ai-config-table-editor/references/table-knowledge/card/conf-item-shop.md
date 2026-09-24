@@ -18,7 +18,7 @@
 ## 已确认规则（2026-09-03 数据验证 + 用户确认）
 
 1. `Shop.rewardId` 必须存在于 `Item.sn`（61 条全命中）。
-2. `Shop.name` 必须等于 `Item.desc`（曾发现 sn=10006 不一致，已把 Item 改为"初始牌刷新卡"，现 0 差异）。
+2. `Shop.name` 必须等于 `Item.desc` 或 `Item.title` 其中之一（2026-09-11 更新：卡类商品名放在 `Item.title`、详细说明放在 `Item.desc`；表情/时装/装扮/竞技场类则名称放在 `Item.desc`，`Item.title` 为分类名）。
 3. type1=7（表情）：`Item.id` → `Emotion.sn`，且 `Item.desc` == `Emotion.desc` == `Shop.name`（9/9 通过）。
 4. type1=8（时装）：`Item.id` → `Avatar.sn`，且名称一致（42/42 通过）。
 5. 新增商城商品时不得直接发明 rewardId：必须先建 `Item.sn` 行，再在 Shop 中引用。
